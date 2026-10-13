@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lead Manager · Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #f6f8fc;
+            padding: 2rem 1.5rem;
+            color: #1e293b;
+        }
+
+        .dashboard {
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        /* header */
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.75rem;
+        }
+
+        .header h1 {
+            font-size: 1.9rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .header h1 span {
+            background: #2563eb;
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            letter-spacing: 0.3px;
+        }
+
+        .badge {
+            background: #e2e8f0;
+            border-radius: 30px;
+            padding: 0.3rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #334155;
+        }
+
+        /* filter card */
+        .filter-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.02), 0 2px 6px rgba(0,0,0,0.03);
+            border: 1px solid #e9eef3;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 1rem 1.25rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 150px;
+            flex: 1 1 150px;
+        }
+
+        .filter-group label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 0.3rem;
+            white-space: nowrap;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 0.6rem 0.9rem;
+            border-radius: 12px;
+            border: 1.5px solid #e2e8f0;
+            font-size: 0.9rem;
+            background: #f9fbfd;
+            transition: 0.15s;
+            outline: none;
+            width: 100%;
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            border-color: #2563eb;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* search group spans wider */
+        .filter-group.search-group {
+            flex: 2 1 260px;
+            min-width: 220px;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 0.65rem;
+            flex-wrap: wrap;
+            margin-left: auto;
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            padding: 0.6rem 1.3rem;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.85rem;
+            border: none;
+            cursor: pointer;
+            transition: 0.15s;
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            color: #1e293b;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: #1e293b;
+            border-color: #1e293b;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0f172a;
+            border-color: #0f172a;
+        }
+
+        .btn-outline {
+            background: white;
+            border-color: #cbd5e1;
+        }
+
+        .btn-outline:hover {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+        }
+
+        .btn-csv {
+            background: #0f172a;
+            border-color: #0f172a;
+            color: white;
+        }
+
+        .btn-csv:hover {
+            background: #1e293b;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* table */
+        .table-container {
+            background: white;
+            border-radius: 24px;
+            border: 1px solid #e9eef3;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.02);
+            overflow-x: auto;
+            padding: 0.2rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            min-width: 1300px;
+        }
+
+        th {
+            text-align: left;
+            padding: 0.9rem 1.2rem;
+            background: #f9fbfd;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: #475569;
+            border-bottom: 1.5px solid #e9eef3;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 0.9rem 1.2rem;
+            border-bottom: 1px solid #f1f5f9;
+            color: #1e293b;
+            white-space: nowrap;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: #fafcff;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background: #f1f5f9;
+            color: #475569;
+            text-transform: capitalize;
+        }
+
+        .status-pending {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+
+        .status-sent, .status-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        /* pagination */
+        .pagination-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .pagination-info {
+            font-size: 0.9rem;
+            color: #475569;
+            background: #f1f5f9;
+            padding: 0.4rem 1rem;
+            border-radius: 30px;
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .page-btn {
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.1s;
+            color: #1e293b;
+        }
+
+        .page-btn.active {
+            background: #1e293b;
+            border-color: #1e293b;
+            color: white;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .limit-selector {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+
+        .limit-selector select {
+            padding: 0.5rem 1.2rem 0.5rem 0.8rem;
+            border-radius: 12px;
+            border: 1.5px solid #e2e8f0;
+            background: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 3rem;
+            color: #64748b;
+            font-size: 1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #64748b;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #b91c1c;
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            margin: 1rem 0;
+            border: 1px solid #fecaca;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #0f172a;
+            color: white;
+            padding: 0.8rem 1.6rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        /* small */
+        @media (max-width: 900px) {
+            .filter-group.search-group {
+                flex: 1 1 100%;
+            }
+            .filter-actions {
+                margin-left: 0;
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+
+        @media (max-width: 700px) {
+            body { padding: 1.25rem 1rem; }
+            .filter-card { flex-direction: column; align-items: stretch; }
+            .header h1 { font-size: 1.5rem; }
+            .filter-actions { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- header -->
+        <div class="header">
+            <h1>
+              Lead Manager
+            </h1>
+        </div>
+
+        <!-- filters -->
+        <div class="filter-card">
+            <!-- global search (spans parent, student, phone, email, school) -->
+            <div class="filter-group search-group">
+                <label for="searchFilter">🔎 Search (parent, student, phone, email, school)</label>
+                <input type="text" id="searchFilter" placeholder="Type anything…" autocomplete="off">
+            </div>
+
+            <!-- city -->
+            <div class="filter-group">
+                <label for="cityFilter">City</label>
+                <input type="text" id="cityFilter" placeholder="e.g. Bangalore" autocomplete="off">
+            </div>
+
+            <!-- grade -->
+            <div class="filter-group">
+                <label for="gradeFilter">Grade</label>
+                <input type="text" id="gradeFilter" placeholder="e.g. 12" autocomplete="off">
+            </div>
+
+            <!-- source -->
+            <div class="filter-group">
+                <label for="sourceFilter">Source</label>
+                <input type="text" id="sourceFilter" placeholder="e.g. BYC Website" autocomplete="off">
+            </div>
+
+            <!-- whatsapp status -->
+            <div class="filter-group">
+                <label for="whatsappFilter">WhatsApp status</label>
+                <select id="whatsappFilter">
+                    <option value="">All</option>
+                    <option value="pending">Pending</option>
+                    <option value="sent">Sent</option>
+                    <option value="failed">Failed</option>
+                </select>
+            </div>
+
+            <!-- email status -->
+            <div class="filter-group">
+                <label for="emailStatusFilter">Email status</label>
+                <select id="emailStatusFilter">
+                    <option value="">All</option>
+                    <option value="pending">Pending</option>
+                    <option value="sent">Sent</option>
+                    <option value="failed">Failed</option>
+                </select>
+            </div>
+
+            <!-- actions -->
+            <div class="filter-actions">
+                <button class="btn btn-outline" id="resetFiltersBtn" title="Clear all filters">↺ Reset</button>
+                <button class="btn btn-primary" id="applyFiltersBtn">🔍 Apply filters</button>
+                <button class="btn btn-csv" id="exportCsvBtn">⬇️ Export CSV</button>
+            </div>
+        </div>
+
+        <!-- table area -->
+        <div class="table-container" id="tableContainer">
+            <div class="loading-spinner" id="loadingIndicator">Loading leads…</div>
+            <table id="leadsTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Parent name</th>
+                        <th>Student name</th>
+                        <th>Grade</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>School</th>
+                        <th>City</th>
+                        <th>Source</th>
+                        <th>WhatsApp</th>
+                        <th>Email status</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- dynamic rows -->
+                </tbody>
+            </table>
+            <div class="empty-state" id="emptyState" style="display: none;">No leads found. Try changing filters.</div>
+        </div>
+
+        <!-- pagination -->
+        <div class="pagination-bar">
+            <div class="pagination-info" id="paginationInfo">Page 1 · 0 leads</div>
+            <div class="pagination-controls">
+                <button class="page-btn" id="prevPageBtn" disabled>← Prev</button>
+                <span id="pageIndicator" style="margin: 0 0.5rem; font-weight: 500;">1</span>
+                <button class="page-btn" id="nextPageBtn" disabled>Next →</button>
+                <div class="limit-selector">
+                    <span>Show</span>
+                    <select id="limitSelect">
+                        <option value="10">10</option>
+                        <option value="20" selected>20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- toast -->
+    <div class="toast" id="toast">Exported</div>
+
+    <script>
+        (function() {
+            // --- config ---
+            const API_URL = '/get-leads.php';
+
+            // --- state ---
+            let currentPage = 1;
+            let currentLimit = 20;
+            let totalPages = 1;
+            let totalRecords = 0;
+            let currentFilters = {
+                search: '',
+                city: '',
+                grade: '',
+                source: '',
+                whatsappStatus: '',
+                emailStatus: ''
+            };
+            let allCurrentRows = [];      // store last fetched rows for CSV (current page)
+            let isLoading = false;
+
+            // --- DOM refs ---
+            const tableBody = document.getElementById('tableBody');
+            const leadsTable = document.getElementById('leadsTable');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const emptyState = document.getElementById('emptyState');
+            const paginationInfo = document.getElementById('paginationInfo');
+            const pageIndicator = document.getElementById('pageIndicator');
+            const prevPageBtn = document.getElementById('prevPageBtn');
+            const nextPageBtn = document.getElementById('nextPageBtn');
+            const limitSelect = document.getElementById('limitSelect');
+
+            // filter inputs
+            const searchFilter = document.getElementById('searchFilter');
+            const cityFilter = document.getElementById('cityFilter');
+            const gradeFilter = document.getElementById('gradeFilter');
+            const sourceFilter = document.getElementById('sourceFilter');
+            const whatsappFilter = document.getElementById('whatsappFilter');
+            const emailStatusFilter = document.getElementById('emailStatusFilter');
+
+            // buttons
+            const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+            const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+            const exportCsvBtn = document.getElementById('exportCsvBtn');
+
+            // toast
+            const toastEl = document.getElementById('toast');
+
+            // --- utility: show toast ---
+            function showToast(msg, duration = 2000) {
+                toastEl.textContent = msg;
+                toastEl.classList.add('show');
+                clearTimeout(window.toastTimeout);
+                window.toastTimeout = setTimeout(() => {
+                    toastEl.classList.remove('show');
+                }, duration);
+            }
+
+            // --- build query string for API ---
+            function buildApiUrl() {
+                const params = new URLSearchParams();
+                params.set('page', currentPage);
+                params.set('limit', currentLimit);
+
+                // search (global)
+                if (currentFilters.search.trim()) params.set('search', currentFilters.search.trim());
+                // individual filters
+                if (currentFilters.city.trim()) params.set('city', currentFilters.city.trim());
+                if (currentFilters.grade.trim()) params.set('grade', currentFilters.grade.trim());
+                if (currentFilters.source.trim()) params.set('source', currentFilters.source.trim());
+                if (currentFilters.whatsappStatus) params.set('whatsappStatus', currentFilters.whatsappStatus);
+                if (currentFilters.emailStatus) params.set('emailStatus', currentFilters.emailStatus);
+
+                return `${API_URL}?${params.toString()}`;
+            }
+
+            // --- render table rows ---
+            function renderTable(data) {
+                if (!data || data.length === 0) {
+                    leadsTable.style.display = 'none';
+                    emptyState.style.display = 'block';
+                    tableBody.innerHTML = '';
+                    return;
+                }
+
+                leadsTable.style.display = 'table';
+                emptyState.style.display = 'none';
+
+                let rowsHtml = '';
+                data.forEach(lead => {
+                    const phoneDisplay = lead.phone ? `${lead.country_code || ''} ${lead.phone}`.trim() : '—';
+                    const statusWhatsapp = lead.whatsapp_status || 'pending';
+                    const statusEmail = lead.email_status || 'pending';
+                    const created = lead.created_at ? lead.created_at.split(' ')[0] : '—';
+
+                    // add status classes
+                    const waClass = statusWhatsapp === 'sent' ? 'status-sent' : (statusWhatsapp === 'pending' ? 'status-pending' : '');
+                    const emailClass = statusEmail === 'sent' ? 'status-sent' : (statusEmail === 'pending' ? 'status-pending' : '');
+
+                    rowsHtml += `<tr>
+                        <td>${lead.id ?? '—'}</td>
+                        <td>${escapeHtml(lead.parent_name || '—')}</td>
+                        <td>${escapeHtml(lead.student_name || '—')}</td>
+                        <td>${escapeHtml(lead.grade || '—')}</td>
+                        <td>${escapeHtml(lead.email || '—')}</td>
+                        <td>${escapeHtml(phoneDisplay)}</td>
+                        <td>${escapeHtml(lead.school || '—')}</td>
+                        <td>${escapeHtml(lead.city || '—')}</td>
+                        <td>${escapeHtml(lead.source || '—')}</td>
+                        <td><span class="status-badge ${waClass}">${escapeHtml(statusWhatsapp)}</span></td>
+                        <td><span class="status-badge ${emailClass}">${escapeHtml(statusEmail)}</span></td>
+                        <td>${escapeHtml(created)}</td>
+                    </tr>`;
+                });
+
+                tableBody.innerHTML = rowsHtml;
+            }
+
+            // simple escape
+            function escapeHtml(unsafe) {
+                if (unsafe === null || unsafe === undefined) return '—';
+                return String(unsafe)
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+
+            // --- update pagination UI ---
+            function updatePaginationUI(pagination) {
+                if (pagination) {
+                    totalPages = pagination.totalPages || 1;
+                    totalRecords = pagination.total || 0;
+                    // if currentPage > totalPages, correct it
+                    if (currentPage > totalPages) currentPage = totalPages;
+                }
+                pageIndicator.textContent = currentPage;
+                paginationInfo.textContent = `Page ${currentPage} of ${totalPages} · ${totalRecords} leads`;
+
+                prevPageBtn.disabled = (currentPage <= 1);
+                nextPageBtn.disabled = (currentPage >= totalPages);
+            }
+
+            // --- fetch leads from API ---
+            async function fetchLeads() {
+                if (isLoading) return;
+                isLoading = true;
+                loadingIndicator.style.display = 'block';
+                leadsTable.style.display = 'none';
+                emptyState.style.display = 'none';
+
+                const url = buildApiUrl();
+                console.log('Fetching:', url); // optional debug
+
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status} – ${response.statusText}`);
+                    }
+                    const result = await response.json();
+
+                    if (!result.success) {
+                        throw new Error(result.message || 'API returned success=false');
+                    }
+
+                    // store rows for CSV export (current page)
+                    allCurrentRows = result.data || [];
+
+                    // render table
+                    renderTable(allCurrentRows);
+
+                    // update pagination from response
+                    if (result.pagination) {
+                        // ensure current page matches (sometimes API returns page)
+                        currentPage = result.pagination.page || currentPage;
+                        totalPages = result.pagination.totalPages || 1;
+                        totalRecords = result.pagination.total || 0;
+
+                        // update limit if API returns something (should match)
+                        if (result.pagination.limit) {
+                            currentLimit = result.pagination.limit;
+                            // update select if needed
+                            if (limitSelect.value !== String(currentLimit)) {
+                                limitSelect.value = currentLimit;
+                            }
+                        }
+                        updatePaginationUI(result.pagination);
+                    } else {
+                        // fallback
+                        updatePaginationUI({
+                            page: currentPage,
+                            limit: currentLimit,
+                            total: allCurrentRows.length,
+                            totalPages: 1
+                        });
+                    }
+
+                } catch (err) {
+                    console.error('Fetch error:', err);
+                    tableBody.innerHTML = '';
+                    leadsTable.style.display = 'none';
+                    emptyState.style.display = 'block';
+                    emptyState.textContent = `⚠️ Error: ${err.message}. Make sure API is running at ${API_URL}`;
+                    paginationInfo.textContent = `Error loading data`;
+                    showToast(`Error: ${err.message}`, 4000);
+                } finally {
+                    loadingIndicator.style.display = 'none';
+                    isLoading = false;
+                }
+            }
+
+            // --- apply filters (reset to page 1) ---
+            function applyFilters() {
+                // read filter values
+                currentFilters = {
+                    search: searchFilter.value,
+                    city: cityFilter.value,
+                    grade: gradeFilter.value,
+                    source: sourceFilter.value,
+                    whatsappStatus: whatsappFilter.value,
+                    emailStatus: emailStatusFilter.value
+                };
+                currentPage = 1;   // reset page
+                fetchLeads();
+            }
+
+            // --- reset filters ---
+            function resetFilters() {
+                searchFilter.value = '';
+                cityFilter.value = '';
+                gradeFilter.value = '';
+                sourceFilter.value = '';
+                whatsappFilter.value = '';
+                emailStatusFilter.value = '';
+                currentFilters = {
+                    search: '',
+                    city: '',
+                    grade: '',
+                    source: '',
+                    whatsappStatus: '',
+                    emailStatus: ''
+                };
+                currentPage = 1;
+                fetchLeads();
+            }
+
+            // --- pagination actions ---
+            function goToPrevPage() {
+                if (currentPage > 1) {
+                    currentPage--;
+                    fetchLeads();
+                }
+            }
+
+            function goToNextPage() {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    fetchLeads();
+                }
+            }
+
+            function changeLimit(newLimit) {
+                currentLimit = parseInt(newLimit, 10);
+                currentPage = 1;   // reset to first page when limit changes
+                fetchLeads();
+            }
+
+            // --- export current page as CSV ---
+            function exportToCsv() {
+                if (!allCurrentRows || allCurrentRows.length === 0) {
+                    showToast('No data to export on this page');
+                    return;
+                }
+
+                // define columns to export (match table headers, but we use field names)
+                const columns = [
+                    { key: 'id', label: 'ID' },
+                    { key: 'parent_name', label: 'Parent Name' },
+                    { key: 'student_name', label: 'Student Name' },
+                    { key: 'grade', label: 'Grade' },
+                    { key: 'email', label: 'Email' },
+                    { key: 'country_code', label: 'Country Code' },
+                    { key: 'phone', label: 'Phone' },
+                    { key: 'school', label: 'School' },
+                    { key: 'city', label: 'City' },
+                    { key: 'profession', label: 'Profession' },
+                    { key: 'source', label: 'Source' },
+                    { key: 'whatsapp_status', label: 'WhatsApp Status' },
+                    { key: 'email_status', label: 'Email Status' },
+                    { key: 'created_at', label: 'Created At' },
+                    { key: 'updated_at', label: 'Updated At' }
+                ];
+
+                // build CSV header
+                const header = columns.map(c => `"${c.label}"`).join(',');
+
+                const rows = allCurrentRows.map(lead => {
+                    return columns.map(col => {
+                        let value = lead[col.key];
+                        if (value === null || value === undefined) value = '';
+                        // escape double quotes
+                        const escaped = String(value).replace(/"/g, '""');
+                        return `"${escaped}"`;
+                    }).join(',');
+                });
+
+                const csvContent = [header, ...rows].join('\n');
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `leads_page_${currentPage}_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+
+                showToast(`✅ Exported ${allCurrentRows.length} rows`);
+            }
+
+            // --- event listeners ---
+            function attachEvents() {
+                // apply filters button and enter key in inputs
+                applyFiltersBtn.addEventListener('click', applyFilters);
+                resetFiltersBtn.addEventListener('click', resetFilters);
+
+                // enter key on any filter input triggers apply
+                const filterInputs = [searchFilter, cityFilter, gradeFilter, sourceFilter, whatsappFilter, emailStatusFilter];
+                filterInputs.forEach(input => {
+                    input.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            applyFilters();
+                        }
+                    });
+                });
+
+                // export
+                exportCsvBtn.addEventListener('click', exportToCsv);
+
+                // pagination
+                prevPageBtn.addEventListener('click', goToPrevPage);
+                nextPageBtn.addEventListener('click', goToNextPage);
+
+                // limit change
+                limitSelect.addEventListener('change', (e) => {
+                    changeLimit(e.target.value);
+                });
+            }
+
+            // --- initial load ---
+            function init() {
+                attachEvents();
+                // set default limit from select
+                currentLimit = parseInt(limitSelect.value, 10);
+                currentPage = 1;
+                fetchLeads();
+            }
+
+            init();
+        })();
+    </script>
+</body>
+</html>
